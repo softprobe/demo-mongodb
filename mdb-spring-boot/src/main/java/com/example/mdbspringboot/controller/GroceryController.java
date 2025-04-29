@@ -2,8 +2,10 @@ package com.example.mdbspringboot.controller;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
@@ -34,7 +36,8 @@ public class GroceryController {
      */
     @GetMapping("")
     public List<GroceryItem> getAllGroceries() {
-        String url = "http://114.215.188.138:8100/book/bookWithCash";
+        String msg ="";
+        String url = "http://114.215.188.138:8100/search/fun15";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
         String jsonBody = "{\"key\":\"value\"}";
@@ -43,10 +46,12 @@ public class GroceryController {
         ResponseEntity<Resource> response = restTemplate.exchange(url, HttpMethod.POST, entity, Resource.class);
         try {
             InputStream inputStream = response.getBody().getInputStream();
+            msg = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        System.out.println(msg);
         // String msg = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         return groceryItemRepo.findAll();
     }
@@ -120,4 +125,27 @@ public class GroceryController {
     public long countGroceries(){
         return groceryItemRepo.count();
     }
+
+
+    public static class ResponseData {
+        private String msg;
+        private int code;
+        public String getMsg() {
+            return msg;
+        }
+
+        public void setMsg(String msg) {
+            this.msg = msg;
+        }
+        public int getCode() {
+            return code;
+        }
+
+        public void setCode(int code) {
+            this.code = code;
+        }
+
+    }
 }
+
+
