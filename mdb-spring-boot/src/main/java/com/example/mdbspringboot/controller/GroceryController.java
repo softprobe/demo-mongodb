@@ -4,11 +4,13 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.example.mdbspringboot.model.GroceryItem;
 import com.example.mdbspringboot.repository.CustomItemRepository;
 import com.example.mdbspringboot.repository.ItemRepository;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/groceries")
 public class GroceryController {
@@ -97,4 +99,4 @@ public class GroceryController {
     public long countGroceries(){
         return groceryItemRepo.count();
     }
-} 
+}

@@ -1,0 +1,26 @@
+# ViteJS
+/dist
+/.local
+/.output
+/node_modules
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+/target/
+/bin/
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# NetBeans
+/nbproject/private/
+/build/
+/dist/
+/nbdist/
+/.nb-gradle/
