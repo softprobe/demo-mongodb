@@ -1,10 +1,17 @@
 package com.example.mdbspringboot.controller;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.client.RestTemplate;
 
 import com.example.mdbspringboot.model.GroceryItem;
 import com.example.mdbspringboot.repository.CustomItemRepository;
@@ -27,6 +34,20 @@ public class GroceryController {
      */
     @GetMapping("")
     public List<GroceryItem> getAllGroceries() {
+        String url = "http://114.215.188.138:8100/book/bookWithCash";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
+        String jsonBody = "{\"key\":\"value\"}";
+        HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Resource> response = restTemplate.exchange(url, HttpMethod.POST, entity, Resource.class);
+        try {
+            InputStream inputStream = response.getBody().getInputStream();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        // String msg = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         return groceryItemRepo.findAll();
     }
 
