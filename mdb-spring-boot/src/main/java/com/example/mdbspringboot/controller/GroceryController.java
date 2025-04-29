@@ -52,7 +52,7 @@ public class GroceryController {
      * POST /api/groceries
      * Creates a new grocery item.
      */
-    @PostMapping("")
+    @PostMapping("/create")
     public GroceryItem createGrocery(@RequestBody GroceryItem groceryItem) {
         return groceryItemRepo.save(groceryItem);
     }

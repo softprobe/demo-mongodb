@@ -49,7 +49,7 @@ export async function fetchGroceriesByCategory(category: string): Promise<Grocer
 }
 
 export async function createGrocery(item: Omit<GroceryItem, "id">): Promise<GroceryItem> {
-  const response = await fetch(`${API_URL}`, {
+  const response = await fetch(`${API_URL}/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
