@@ -36,23 +36,10 @@ public class GroceryController {
      */
     @GetMapping("")
     public List<GroceryItem> getAllGroceries() {
-        String msg ="";
-        String url = "http://114.215.188.138:8100/search/fun15";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
-        String jsonBody = "{\"key\":\"value\"}";
-        HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Resource> response = restTemplate.exchange(url, HttpMethod.POST, entity, Resource.class);
-        try {
-            InputStream inputStream = response.getBody().getInputStream();
-            msg = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        System.out.println(msg);
-        // String msg = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+        ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:8082/hello", String.class);
+        String message = response.getBody();
+        System.out.println("Response message: " + message);
         return groceryItemRepo.findAll();
     }
 
