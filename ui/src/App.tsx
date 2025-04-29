@@ -8,6 +8,27 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// Asynchronously load SDK to optimize first-screen performance
+const initializeAnalytics = async () => {
+  try {
+    const { default: initSoftprobe } = await import('@softprobe/softprobe-web-record-sdk');
+    initSoftprobe({
+      appId: 'appId-softprobe-demo-page', // Replace with your application ID
+      tenantId: 'tenant-softprobe-test-user',         // Replace with your tenant ID
+      tags: { 
+        userRole: 'guest',                 // Custom tags (optional, for categorical search)
+      },
+      privacy: {
+        maskSelectors: ['.credit-card', '#password'] // DOM elements to mask
+      }
+    });
+  } catch (error) {
+    console.error('Softprobe initialization failed:', error);
+  }
+};
+ 
+initializeAnalytics();
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
