@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS}, allowCredentials = "true")
 public class LoginController {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
@@ -26,9 +26,16 @@ public class LoginController {
         USERS.put("admin", "password");
     }
 
+    @GetMapping("/health")
+    public ResponseEntity<?> healthCheck() {
+        logger.info("Health check requested");
+        return ResponseEntity.ok(Map.of("status", "ok"));
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         logger.info("Login attempt for user: {}", loginRequest.getUsername());
+        logger.debug("Login request body: {}", loginRequest);
         
         if (loginRequest.getUsername() == null || loginRequest.getPassword() == null) {
             logger.warn("Login failed: username or password is null");
@@ -41,8 +48,14 @@ public class LoginController {
         
         if (storedPassword != null && storedPassword.equals(loginRequest.getPassword())) {
             logger.info("Login successful for user: {}", loginRequest.getUsername());
-            String token = jwtUtil.generateToken(loginRequest.getUsername());
-            return ResponseEntity.ok(Map.of("token", token));
+            try {
+                String token = jwtUtil.generateToken(loginRequest.getUsername());
+                logger.debug("Generated token for user {}: {}", loginRequest.getUsername(), token);
+                return ResponseEntity.ok(Map.of("token", token));
+            } catch (Exception e) {
+                logger.error("Error generating token for user {}: {}", loginRequest.getUsername(), e.getMessage());
+                return ResponseEntity.status(500).body(Map.of("error", "Error generating token"));
+            }
         }
         
         logger.warn("Login failed for user: {}", loginRequest.getUsername());
@@ -68,6 +81,14 @@ public class LoginController {
 
         public void setPassword(String password) {
             this.password = password;
+        }
+
+        @Override
+        public String toString() {
+            return "LoginRequest{" +
+                    "username='" + username + '\'' +
+                    ", password='[PROTECTED]'" +
+                    '}';
         }
     }
 } 

@@ -21,9 +21,10 @@ import com.example.mdbspringboot.model.GroceryItem;
 import com.example.mdbspringboot.repository.CustomItemRepository;
 import com.example.mdbspringboot.repository.ItemRepository;
 
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/groceries")
+@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS})
 public class GroceryController {
 
     private static final Logger logger = LoggerFactory.getLogger(GroceryController.class);
