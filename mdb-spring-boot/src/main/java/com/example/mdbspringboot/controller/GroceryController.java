@@ -1,19 +1,21 @@
 package com.example.mdbspringboot.controller;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.example.mdbspringboot.model.GroceryItem;
 import com.example.mdbspringboot.repository.CustomItemRepository;
@@ -23,6 +25,9 @@ import com.example.mdbspringboot.repository.ItemRepository;
 @RestController
 @RequestMapping("/api/groceries")
 public class GroceryController {
+
+    private static final Logger logger = LoggerFactory.getLogger(GroceryController.class);
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private ItemRepository groceryItemRepo;
@@ -34,12 +39,8 @@ public class GroceryController {
      * GET /api/groceries
      * Returns all grocery items.
      */
-    @GetMapping("")
+    @GetMapping("getAll")
     public List<GroceryItem> getAllGroceries() {
-//        RestTemplate restTemplate = new RestTemplate();
-//        ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:8082/hello", String.class);
-//        String message = response.getBody();
-//        System.out.println("Response message: " + message);
         return groceryItemRepo.findAll();
     }
 
@@ -66,8 +67,38 @@ public class GroceryController {
      * Creates a new grocery item.
      */
     @PostMapping("/create")
-    public GroceryItem createGrocery(@RequestBody GroceryItem groceryItem) {
-        return groceryItemRepo.save(groceryItem);
+    public ResponseEntity<?> createGrocery(@RequestBody GroceryItem groceryItem) {
+        try {
+            // 调用time接口
+            String timeResponse = callTimeApi(groceryItem.getName());
+            logger.info("Time API response: {}", timeResponse);
+
+            // 保存grocery item
+            groceryItemRepo.save(groceryItem);
+            return new ResponseEntity<>(groceryItem, HttpStatus.CREATED);
+        } catch (Exception e) {
+            logger.error("Error creating grocery item: {}", e.getMessage());
+            return new ResponseEntity<>("Error creating grocery item: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private String callTimeApi(String name) throws Exception {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost httpPost = new HttpPost("http://localhost:8080/time");
+            
+            // 设置请求头
+            httpPost.setHeader("Content-Type", "application/json");
+            
+            // 创建请求体
+            String jsonBody = String.format("{\"name\":\"%s\"}", name);
+            StringEntity entity = new StringEntity(jsonBody, ContentType.APPLICATION_JSON);
+            httpPost.setEntity(entity);
+            
+            // 执行请求
+            try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                return EntityUtils.toString(response.getEntity());
+            }
+        }
     }
 
     /**
