@@ -19,9 +19,9 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        // Skip JWT validation for login endpoint
-        if (request.getRequestURI().equals("/api/login")) {
-            logger.debug("Skipping JWT validation for login endpoint");
+        // Skip JWT validation for login endpoint and OPTIONS requests
+        if (request.getRequestURI().equals("/api/login") || request.getMethod().equals("OPTIONS")) {
+            logger.debug("Skipping JWT validation for {} request", request.getMethod());
             return true;
         }
 

@@ -12,12 +12,14 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.MongoCollection;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@CrossOrigin(origins = "*")
 @RestController
 public class MongoDBController {
 
