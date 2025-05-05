@@ -1,9 +1,8 @@
 package com.example.mdbspringboot.controller;
 
-import com.example.mdbspringboot.util.JwtUtil;
+import com.example.mdbspringboot.util.JwtUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,9 +16,6 @@ import java.util.Map;
 public class LoginController {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
-
-    @Autowired
-    private JwtUtil jwtUtil;
 
     // Simple in-memory user store
     private static final Map<String, String> USERS = new HashMap<>();
@@ -50,7 +46,7 @@ public class LoginController {
         if (storedPassword != null && storedPassword.equals(loginRequest.getPassword())) {
             logger.info("Login successful for user: {}", loginRequest.getUsername());
             try {
-                String token = jwtUtil.generateToken(loginRequest.getUsername());
+                String token = JwtUtils.makeAccessToken(loginRequest.getUsername());
                 logger.debug("Generated token for user {}: {}", loginRequest.getUsername(), token);
                 return ResponseEntity.ok(Map.of("token", token));
             } catch (Exception e) {

@@ -25,7 +25,7 @@ import {
 const API_URL = "/api/groceries";
 
 export async function fetchAllGroceries(): Promise<GroceryItem[]> {
-  const response = await request.get(API_URL);
+  const response = await request.get(`${API_URL}/getAll`);
   if (!response.data) {
     throw new Error("Failed to fetch grocery items");
   }
