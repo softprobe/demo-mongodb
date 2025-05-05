@@ -89,20 +89,20 @@ const initializeAnalytics = async () => {
     console.error('Softprobe initialization failed:', error);
   }
 };
- 
+
 const App = () => {
   useEffect(() => {
-initializeAnalytics();
+    // initializeAnalytics();
   }, []);
 
   return (
     <ErrorBoundary>
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
               <Route path="/login" element={<Login />} />
               <Route
                 path="/"
@@ -112,14 +112,14 @@ initializeAnalytics();
                   </ProtectedRoute>
                 }
               />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
     </ErrorBoundary>
-);
+  );
 };
 
 export default App;
