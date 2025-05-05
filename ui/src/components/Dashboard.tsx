@@ -19,6 +19,7 @@ import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import EmptyState from "@/components/EmptyState";
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "./ui/button";
 
 const Dashboard = () => {
   const { toast } = useToast();
