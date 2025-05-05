@@ -1,46 +1,25 @@
-import { getToken } from '@/services/authService';
 import axios from 'axios';
-
-export const API_URL = 'http://localhost:8080';
+import { API_URL } from './config';
 
 const request = axios.create({
     baseURL: API_URL,
+    withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
-    },
-    withCredentials: true,
+        'Accept': 'application/json'
+    }
 });
 
-// Configure axios defaults
-request.defaults.baseURL = API_URL;
-request.defaults.headers.common['Content-Type'] = 'application/json';
-request.defaults.withCredentials = true; // Enable credentials
-request.defaults.timeout = 5000; // 5 seconds timeout
-
-// Add request interceptor for logging and token handling
+// Add request interceptor to add token
 request.interceptors.request.use(
     (config) => {
-        // Skip token for login request
-        if (config.url === '/api/login') {
-            console.log('Login request, skipping token');
-            return config;
-        }
-
-        const token = getToken();
-
+        const token = document.cookie.split('; ').find(row => row.startsWith('login-token='))?.split('=')[1];
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
-            console.log('Request with token:', {
-                url: config.url,
-                headers: config.headers
-            });
-        } else {
-            console.warn('No token available for request:', config.url);
         }
         return config;
     },
     (error) => {
-        console.error('Request error:', error);
         return Promise.reject(error);
     }
 );

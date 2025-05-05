@@ -1,4 +1,3 @@
-
 import request from "@/utils/request";
 import { GroceryItem } from "../types/groceryTypes";
 import {
@@ -23,10 +22,10 @@ import {
 // export const getGroceryCount = mockGetGroceryCount;
 
 // Uncomment and use the below code when connecting to the real API
-const API_URL = "http://localhost:8080/api/groceries";
+const API_URL = "/api/groceries";
 
 export async function fetchAllGroceries(): Promise<GroceryItem[]> {
-  const response = await request.get(`${API_URL}`);
+  const response = await request.get(API_URL);
   if (!response.data) {
     throw new Error("Failed to fetch grocery items");
   }
@@ -42,11 +41,7 @@ export async function fetchGroceryByName(name: string): Promise<GroceryItem> {
 }
 
 export async function fetchGroceriesByCategory(category: string): Promise<GroceryItem[]> {
-  const response = await request.get(`${API_URL}/category/${encodeURIComponent(category)}`, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await request.get(`${API_URL}/category/${encodeURIComponent(category)}`);
   if (!response.data) {
     throw new Error(`Failed to fetch grocery items in category: ${category}`);
   }
@@ -54,12 +49,7 @@ export async function fetchGroceriesByCategory(category: string): Promise<Grocer
 }
 
 export async function createGrocery(item: Omit<GroceryItem, "id">): Promise<GroceryItem> {
-  const response = await request.post(`${API_URL}/create`, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    data: item,
-  });
+  const response = await request.post(`${API_URL}/create`, item);
   if (!response.data) {
     throw new Error("Failed to create grocery item");
   }
@@ -67,7 +57,12 @@ export async function createGrocery(item: Omit<GroceryItem, "id">): Promise<Groc
 }
 
 export async function updateCategory(currentCategory: string, newCategory: string): Promise<string> {
-  const response = await request.put(`${API_URL}/updateCategory?currentCategory=${encodeURIComponent(currentCategory)}&newCategory=${encodeURIComponent(newCategory)}`);
+  const response = await request.put(`${API_URL}/updateCategory`, null, {
+    params: {
+      currentCategory,
+      newCategory
+    }
+  });
   if (!response.data) {
     throw new Error("Failed to update category");
   }
@@ -75,7 +70,12 @@ export async function updateCategory(currentCategory: string, newCategory: strin
 }
 
 export async function updateQuantity(name: string, newQuantity: number): Promise<string> {
-  const response = await request.put(`${API_URL}/updateQuantity?name=${encodeURIComponent(name)}&newQuantity=${newQuantity}`);
+  const response = await request.put(`${API_URL}/updateQuantity`, null, {
+    params: {
+      name,
+      newQuantity
+    }
+  });
   if (!response.data) {
     throw new Error(`Failed to update quantity for item: ${name}`);
   }

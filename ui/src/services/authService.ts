@@ -1,4 +1,5 @@
-import request, { API_URL } from '@/utils/request';
+import request from '@/utils/request';
+import { API_URL } from '@/utils/config';
 
 export interface LoginCredentials {
     username: string;
