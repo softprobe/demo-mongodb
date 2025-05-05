@@ -16,7 +16,7 @@ export default function Login() {
         e.preventDefault();
         setError('');
         setIsLoading(true);
-        
+
         try {
             console.log('Starting login process...');
             await login(credentials);
@@ -25,8 +25,8 @@ export default function Login() {
         } catch (err) {
             console.error('Login error details:', err);
             if (axios.isAxiosError(err)) {
-                const errorMessage = err.response?.data?.error || 
-                    err.message || 
+                const errorMessage = err.response?.data?.error ||
+                    err.message ||
                     'Login failed';
                 console.error('Axios error details:', {
                     status: err.response?.status,
@@ -102,9 +102,8 @@ export default function Login() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                                isLoading ? 'bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-700'
-                            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+                            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${isLoading ? 'bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-700'
+                                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
                         >
                             {isLoading ? 'Signing in...' : 'Sign in'}
                         </button>

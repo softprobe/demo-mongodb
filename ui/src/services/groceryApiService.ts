@@ -1,4 +1,5 @@
 
+import request from "@/utils/request";
 import { GroceryItem } from "../types/groceryTypes";
 import {
   mockFetchAllGroceries,
@@ -25,83 +26,74 @@ import {
 const API_URL = "http://localhost:8080/api/groceries";
 
 export async function fetchAllGroceries(): Promise<GroceryItem[]> {
-  const response = await fetch(`${API_URL}`);
-  if (!response.ok) {
+  const response = await request.get(`${API_URL}`);
+  if (!response.data) {
     throw new Error("Failed to fetch grocery items");
   }
-  return response.json();
+  return response.data;
 }
 
 export async function fetchGroceryByName(name: string): Promise<GroceryItem> {
-  const response = await fetch(`${API_URL}/name/${encodeURIComponent(name)}`);
-  if (!response.ok) {
+  const response = await request.get(`${API_URL}/name/${encodeURIComponent(name)}`);
+  if (!response.data) {
     throw new Error(`Failed to fetch grocery item with name: ${name}`);
   }
-  return response.json();
+  return response.data;
 }
 
 export async function fetchGroceriesByCategory(category: string): Promise<GroceryItem[]> {
-  const response = await fetch(`${API_URL}/category/${encodeURIComponent(category)}`);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch grocery items in category: ${category}`);
-  }
-  return response.json();
-}
-
-export async function createGrocery(item: Omit<GroceryItem, "id">): Promise<GroceryItem> {
-  const response = await fetch(`${API_URL}/create`, {
-    method: "POST",
+  const response = await request.get(`${API_URL}/category/${encodeURIComponent(category)}`, {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(item),
   });
-  if (!response.ok) {
+  if (!response.data) {
+    throw new Error(`Failed to fetch grocery items in category: ${category}`);
+  }
+  return response.data;
+}
+
+export async function createGrocery(item: Omit<GroceryItem, "id">): Promise<GroceryItem> {
+  const response = await request.post(`${API_URL}/create`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: item,
+  });
+  if (!response.data) {
     throw new Error("Failed to create grocery item");
   }
-  return response.json();
+  return response.data;
 }
 
 export async function updateCategory(currentCategory: string, newCategory: string): Promise<string> {
-  const response = await fetch(
-    `${API_URL}/updateCategory?currentCategory=${encodeURIComponent(currentCategory)}&newCategory=${encodeURIComponent(newCategory)}`,
-    {
-      method: "PUT",
-    }
-  );
-  if (!response.ok) {
+  const response = await request.put(`${API_URL}/updateCategory?currentCategory=${encodeURIComponent(currentCategory)}&newCategory=${encodeURIComponent(newCategory)}`);
+  if (!response.data) {
     throw new Error("Failed to update category");
   }
-  return response.text();
+  return response.data;
 }
 
 export async function updateQuantity(name: string, newQuantity: number): Promise<string> {
-  const response = await fetch(
-    `${API_URL}/updateQuantity?name=${encodeURIComponent(name)}&newQuantity=${newQuantity}`,
-    {
-      method: "PUT",
-    }
-  );
-  if (!response.ok) {
+  const response = await request.put(`${API_URL}/updateQuantity?name=${encodeURIComponent(name)}&newQuantity=${newQuantity}`);
+  if (!response.data) {
     throw new Error(`Failed to update quantity for item: ${name}`);
   }
-  return response.text();
+  return response.data;
 }
 
 export async function deleteGrocery(id: string): Promise<string> {
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) {
+  const response = await request.delete(`${API_URL}/${id}`);
+  if (!response.data) {
     throw new Error(`Failed to delete grocery item with id: ${id}`);
   }
-  return response.text();
+  return response.data;
 }
 
 export async function getGroceryCount(): Promise<number> {
-  const response = await fetch(`${API_URL}/count`);
-  if (!response.ok) {
+  const response = await request.get(`${API_URL}/count`);
+  if (!response.data) {
     throw new Error("Failed to fetch grocery count");
   }
-  return response.json();
+  return response.data;
 }

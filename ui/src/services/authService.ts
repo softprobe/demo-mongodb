@@ -1,60 +1,4 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:8080';
-
-// Configure axios defaults
-axios.defaults.baseURL = API_URL;
-axios.defaults.headers.common['Content-Type'] = 'application/json';
-axios.defaults.withCredentials = true; // Enable credentials
-axios.defaults.timeout = 5000; // 5 seconds timeout
-
-// Add request interceptor for logging and token handling
-axios.interceptors.request.use(
-    (config) => {
-        // Skip token for login request
-        if (config.url === '/api/login') {
-            console.log('Login request, skipping token');
-            return config;
-        }
-
-        const token = getToken();
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-            console.log('Request with token:', {
-                url: config.url,
-                headers: config.headers
-            });
-        } else {
-            console.warn('No token available for request:', config.url);
-        }
-        return config;
-    },
-    (error) => {
-        console.error('Request error:', error);
-        return Promise.reject(error);
-    }
-);
-
-// Add response interceptor for logging
-axios.interceptors.response.use(
-    (response) => {
-        console.log('Response:', {
-            status: response.status,
-            headers: response.headers,
-            data: response.data
-        });
-        return response;
-    },
-    (error) => {
-        console.error('Response error:', {
-            status: error.response?.status,
-            data: error.response?.data,
-            headers: error.response?.headers,
-            message: error.message
-        });
-        return Promise.reject(error);
-    }
-);
+import request, { API_URL } from '@/utils/request';
 
 export interface LoginCredentials {
     username: string;
@@ -63,6 +7,8 @@ export interface LoginCredentials {
 
 // Check if token is expired
 const isTokenExpired = (token: string): boolean => {
+    return false;
+
     try {
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -84,7 +30,7 @@ export const login = async (credentials: LoginCredentials) => {
         console.log('Attempting login with credentials:', credentials);
         console.log('API URL:', API_URL);
         
-        const response = await axios.post('/api/login', {
+        const response = await request.post('/api/login', {
             username: credentials.username,
             password: credentials.password
         }, {
@@ -117,35 +63,27 @@ export const login = async (credentials: LoginCredentials) => {
             throw new Error('No token received from server');
         }
 
-        localStorage.setItem('token', token);
-        console.log('Token stored in localStorage');
+        // Store token in cookie
+        document.cookie = `login-token=${token}; path=/; max-age=180000; SameSite=Strict`;
+        console.log('Token stored in cookie');
         return token;
     } catch (error) {
         console.error('Login error details:', error);
-        if (axios.isAxiosError(error)) {
-            console.error('Axios error:', {
-                status: error.response?.status,
-                statusText: error.response?.statusText,
-                data: error.response?.data,
-                headers: error.response?.headers,
-                message: error.message
-            });
-            throw new Error(error.response?.data?.error || error.message || 'Login failed');
-        }
         throw error;
     }
 };
 
 export const logout = () => {
-    localStorage.removeItem('token');
-    console.log('Token removed from localStorage');
+    // Remove token from cookie
+    document.cookie = 'login-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    console.log('Token removed from cookie');
     window.location.href = '/login';
 };
 
 export const getToken = () => {
-    const token = localStorage.getItem('token');
+    const token = document.cookie.split('; ').find(row => row.startsWith('login-token='))?.split('=')[1];
     if (!token) {
-        console.log('No token found in localStorage');
+        console.log('No token found in cookie');
         return null;
     }
     if (isTokenExpired(token)) {
@@ -164,18 +102,3 @@ export const isAuthenticated = () => {
     }
     return true;
 };
-
-// Handle 401 responses
-axios.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        console.log('Response error:', error);
-        if (error.response?.status === 401) {
-            console.log('Unauthorized access, redirecting to login');
-            // Clear token and redirect to login
-            localStorage.removeItem('token');
-            window.location.href = '/login';
-        }
-        return Promise.reject(error);
-    }
-); 
