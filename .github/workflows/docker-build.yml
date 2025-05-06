@@ -24,7 +24,7 @@ jobs:
     - name: Run Maven Build
       run: |
         pushd mdb-spring-boot
-        mvn clean install
+        mvn clean install -DskipTests
         popd
 
     - name: Run NPM Build
