@@ -21,7 +21,7 @@ public class TimeController {
 
     @PostMapping("/time")
     public Map<String, String> getTimeWithName(@RequestBody Map<String, String> request) {
-        logger.info("Received request with name: {}", request.get("name"));
+        logger.info("[SoftProbe]Received request with name: {}", request.get("name"));
         
         String name = request.get("name");
         String currentTime = LocalDateTime.now().format(formatter);

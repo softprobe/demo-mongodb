@@ -76,6 +76,7 @@ public class GroceryController {
 
             // 保存grocery item
             groceryItemRepo.save(groceryItem);
+            groceryItem.setName(groceryItem.getName() + " createTime: " + timeResponse);
             return new ResponseEntity<>(groceryItem, HttpStatus.CREATED);
         } catch (Exception e) {
             logger.error("Error creating grocery item: {}", e.getMessage());
