@@ -36,10 +36,10 @@ public class GroceryController {
      */
     @GetMapping("")
     public List<GroceryItem> getAllGroceries() {
-//        RestTemplate restTemplate = new RestTemplate();
-//        ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:8082/hello", String.class);
-//        String message = response.getBody();
-//        System.out.println("Response message: " + message);
+        // RestTemplate restTemplate = new RestTemplate();
+        // ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:8082/hello", String.class);
+        // String message = response.getBody();
+        // System.out.println("Response message: " + message);
         return groceryItemRepo.findAll();
     }
 
