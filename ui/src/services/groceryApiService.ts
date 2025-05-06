@@ -22,7 +22,7 @@ import {
 // export const getGroceryCount = mockGetGroceryCount;
 
 // Uncomment and use the below code when connecting to the real API
-const API_URL = "http://localhost:8080/api/groceries";
+const API_URL = process.env.API_URL || "http://localhost:8080/api/groceries";
 
 export async function fetchAllGroceries(): Promise<GroceryItem[]> {
   const response = await fetch(`${API_URL}`);
