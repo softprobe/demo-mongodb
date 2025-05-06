@@ -17,9 +17,9 @@ RUN curl -L -o sp-agent.jar https://softprobe.oss-cn-hangzhou.aliyuncs.com/sp-ag
 # export OTEL_EXPORTER_OTLP_ENDPOINT="https://api.honeycomb.io"
 # export OTEL_EXPORTER_OTLP_HEADERS="x-honeycomb-team=ecWFNAhSfmFRrq0RR3tPQK"
 
-ENV SP_SERVICE_NAME=2ae4b9d431dfb747
-ENV SP_STORAGE_SERVICE_HOST=storage-onpremise-gcp.softprobe.ai
-ENV SPRING_DATA_MONGODB_URI=mongodb://localhost:27017/mygrocerylist
+ENV SP_SERVICE_NAME="2ae4b9d431dfb747"
+ENV SP_STORAGE_SERVICE_HOST="storage-onpremise-gcp.softprobe.ai"
+ENV SPRING_DATA_MONGODB_URI="mongodb://localhost:27017/mygrocerylist"
 
 ENTRYPOINT [ \
     "java", \
