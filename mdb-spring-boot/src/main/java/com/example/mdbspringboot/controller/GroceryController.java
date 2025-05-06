@@ -1,18 +1,18 @@
 package com.example.mdbspringboot.controller;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.impl.nio.client.HttpAsyncClients;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.concurrent.FutureCallback;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -71,7 +71,7 @@ public class GroceryController {
     public ResponseEntity<?> createGrocery(@RequestBody GroceryItem groceryItem) {
         try {
             // 调用time接口
-            String timeResponse = callTimeApi(groceryItem.getName());
+            String timeResponse = callTimeApi();
             logger.info("Time API response: {}", timeResponse);
 
             // 保存grocery item
@@ -84,22 +84,39 @@ public class GroceryController {
         }
     }
 
-    private String callTimeApi(String name) throws Exception {
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    private String callTimeApi() {
+        try (CloseableHttpAsyncClient httpClient = HttpAsyncClients.createDefault()) {
+            httpClient.start();
             HttpPost httpPost = new HttpPost("http://localhost:8080/time");
             
-            // 设置请求头
-            httpPost.setHeader("Content-Type", "application/json");
+            CompletableFuture<String> future = new CompletableFuture<>();
             
-            // 创建请求体
-            String jsonBody = String.format("{\"name\":\"%s\"}", name);
-            StringEntity entity = new StringEntity(jsonBody, ContentType.APPLICATION_JSON);
-            httpPost.setEntity(entity);
-            
-            // 执行请求
-            try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
-                return EntityUtils.toString(response.getEntity());
-            }
+            httpClient.execute(httpPost, new FutureCallback<HttpResponse>() {
+                @Override
+                public void completed(HttpResponse response) {
+                    try {
+                        String responseBody = new BasicResponseHandler().handleResponse(response);
+                        future.complete(responseBody);
+                    } catch (Exception e) {
+                        future.completeExceptionally(e);
+                    }
+                }
+
+                @Override
+                public void failed(Exception ex) {
+                    future.completeExceptionally(ex);
+                }
+
+                @Override
+                public void cancelled() {
+                    future.cancel(true);
+                }
+            });
+
+            return future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error: " + e.getMessage();
         }
     }
 
