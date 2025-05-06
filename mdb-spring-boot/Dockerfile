@@ -26,5 +26,5 @@ ENTRYPOINT [ "sh", "-c", "java \
 -Dsp.service.name=${SP_SERVICE_NAME} \
 -Dsp.storage.service.host=${SP_STORAGE_SERVICE_HOST} \
 -Dspring.data.mongodb.uri=${SPRING_DATA_MONGODB_URI} \
--jar app.jar" 
+-jar app.jar" \
 ]
