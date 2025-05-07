@@ -108,6 +108,9 @@ export default function Login() {
                             {isLoading ? 'Signing in...' : 'Sign in'}
                         </button>
                     </div>
+
+                    <p className="mt-2 text-sm text-gray-500 text-center">For demo using account:  admin / password</p>
+
                 </form>
             </div>
         </div>
