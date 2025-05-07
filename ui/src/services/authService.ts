@@ -1,5 +1,5 @@
 import request from '@/utils/request';
-import { API_URL } from '@/utils/config';
+import { API_URL, LOGIN_TOKEN } from '@/utils/config';
 
 export interface LoginCredentials {
     username: string;
@@ -8,8 +8,6 @@ export interface LoginCredentials {
 
 // Check if token is expired
 const isTokenExpired = (token: string): boolean => {
-    return false;
-
     try {
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -65,7 +63,7 @@ export const login = async (credentials: LoginCredentials) => {
         }
 
         // Store token in cookie
-        document.cookie = `login-token=${token}; path=/; max-age=180000; SameSite=Strict`;
+        document.cookie = `${LOGIN_TOKEN}=${token}; path=/; max-age=180000; SameSite=Strict`;
         console.log('Token stored in cookie');
         return token;
     } catch (error) {
@@ -76,13 +74,13 @@ export const login = async (credentials: LoginCredentials) => {
 
 export const logout = () => {
     // Remove token from cookie
-    document.cookie = 'login-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    document.cookie = `${LOGIN_TOKEN}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
     console.log('Token removed from cookie');
     window.location.href = '/login';
 };
 
 export const getToken = () => {
-    const token = document.cookie.split('; ').find(row => row.startsWith('login-token='))?.split('=')[1];
+    const token = document.cookie.split('; ').find(row => row.startsWith(`${LOGIN_TOKEN}=`))?.split('=')[1];
     if (!token) {
         console.log('No token found in cookie');
         return null;
