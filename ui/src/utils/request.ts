@@ -17,6 +17,11 @@ request.interceptors.request.use(
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+
+        // Print complete request URL
+        const fullUrl = `${config.baseURL || ''}${config.url}`;
+        console.log('Request URL:', fullUrl);
+        
         return config;
     },
     (error) => {

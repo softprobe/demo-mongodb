@@ -21,11 +21,8 @@ import {
 // export const deleteGrocery = mockDeleteGrocery;
 // export const getGroceryCount = mockGetGroceryCount;
 
-// Uncomment and use the below code when connecting to the real API
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api/groceries";
-
 export async function fetchAllGroceries(): Promise<GroceryItem[]> {
-  const response = await request.get(`${API_URL}/getAll`);
+  const response = await request.get(`/api/groceries/getAll`);
   if (!response.data) {
     throw new Error("Failed to fetch grocery items");
   }
@@ -33,7 +30,7 @@ export async function fetchAllGroceries(): Promise<GroceryItem[]> {
 }
 
 export async function fetchGroceryByName(name: string): Promise<GroceryItem> {
-  const response = await request.get(`${API_URL}/name/${encodeURIComponent(name)}`);
+  const response = await request.get(`/api/groceries/name/${encodeURIComponent(name)}`);
   if (!response.data) {
     throw new Error(`Failed to fetch grocery item with name: ${name}`);
   }
@@ -41,7 +38,7 @@ export async function fetchGroceryByName(name: string): Promise<GroceryItem> {
 }
 
 export async function fetchGroceriesByCategory(category: string): Promise<GroceryItem[]> {
-  const response = await request.get(`${API_URL}/category/${encodeURIComponent(category)}`);
+  const response = await request.get(`/api/groceries/category/${encodeURIComponent(category)}`);
   if (!response.data) {
     throw new Error(`Failed to fetch grocery items in category: ${category}`);
   }
@@ -49,7 +46,7 @@ export async function fetchGroceriesByCategory(category: string): Promise<Grocer
 }
 
 export async function createGrocery(item: Omit<GroceryItem, "id">): Promise<GroceryItem> {
-  const response = await request.post(`${API_URL}/create`, item);
+  const response = await request.post(`/api/groceries/create`, item);
   if (!response.data) {
     throw new Error("Failed to create grocery item");
   }
@@ -57,7 +54,7 @@ export async function createGrocery(item: Omit<GroceryItem, "id">): Promise<Groc
 }
 
 export async function updateCategory(currentCategory: string, newCategory: string): Promise<string> {
-  const response = await request.put(`${API_URL}/updateCategory`, null, {
+  const response = await request.put(`/api/groceries/updateCategory`, null, {
     params: {
       currentCategory,
       newCategory
@@ -70,7 +67,7 @@ export async function updateCategory(currentCategory: string, newCategory: strin
 }
 
 export async function updateQuantity(name: string, newQuantity: number): Promise<string> {
-  const response = await request.put(`${API_URL}/updateQuantity`, null, {
+  const response = await request.put(`/api/groceries/updateQuantity`, null, {
     params: {
       name,
       newQuantity
@@ -83,7 +80,7 @@ export async function updateQuantity(name: string, newQuantity: number): Promise
 }
 
 export async function deleteGrocery(id: string): Promise<string> {
-  const response = await request.delete(`${API_URL}/${id}`);
+  const response = await request.delete(`/api/groceries/${id}`);
   if (!response.data) {
     throw new Error(`Failed to delete grocery item with id: ${id}`);
   }
@@ -91,7 +88,7 @@ export async function deleteGrocery(id: string): Promise<string> {
 }
 
 export async function getGroceryCount(): Promise<number> {
-  const response = await request.get(`${API_URL}/count`);
+  const response = await request.get(`/api/groceries/count`);
   if (!response.data) {
     throw new Error("Failed to fetch grocery count");
   }

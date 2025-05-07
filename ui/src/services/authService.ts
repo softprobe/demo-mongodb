@@ -1,5 +1,5 @@
 import request from '@/utils/request';
-import { API_URL, LOGIN_TOKEN } from '@/utils/config';
+import { LOGIN_TOKEN } from '@/utils/config';
 
 export interface LoginCredentials {
     username: string;
@@ -27,7 +27,6 @@ const isTokenExpired = (token: string): boolean => {
 export const login = async (credentials: LoginCredentials) => {
     try {
         console.log('Attempting login with credentials:', credentials);
-        console.log('API URL:', API_URL);
         
         const response = await request.post('/api/login', {
             username: credentials.username,
