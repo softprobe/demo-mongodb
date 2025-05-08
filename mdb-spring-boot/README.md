@@ -13,7 +13,7 @@ Copy the following settings from the app settings
 -Darex.service.name=a2aa3b1a3cd8c614 -Darex.api.token=QZMO:H1hUA7BIMvyGXf1GkuoIOjX+enFHt8EJgzvViay9gCdaH4JDhBNBPMfQ3yfdPiyjypTloF4o9OTFlhTVRlLXmw==  -Darex.storage.service.host=storage.softprobe.ai
 ```
 
-## Start Mongodb 
+## Start Mongodb
 
 ```
 docker run --name mongodb -p 27017:27017 -d mongodb/mongodb-community-server:latest

@@ -7,28 +7,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.concurrent.FutureCallback;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.HttpResponse;
+import org.springframework.web.client.RestTemplate;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.example.mdbspringboot.model.GroceryItem;
 import com.example.mdbspringboot.repository.CustomItemRepository;
 import com.example.mdbspringboot.repository.ItemRepository;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/groceries")
-//@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS})
 public class GroceryController {
 
     private static final Logger logger = LoggerFactory.getLogger(GroceryController.class);
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private ItemRepository groceryItemRepo;
@@ -42,10 +33,10 @@ public class GroceryController {
      */
     @GetMapping("getAll")
     public List<GroceryItem> getAllGroceries() {
-        // RestTemplate restTemplate = new RestTemplate();
-        // ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:8082/hello", String.class);
-        // String message = response.getBody();
-        // System.out.println("Response message: " + message);
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.getForEntity("https://ifconfig.me", String.class);
+        String message = response.getBody();
+        logger.info("My ip address is: " + message);
         return groceryItemRepo.findAll();
     }
 
@@ -74,53 +65,11 @@ public class GroceryController {
     @PostMapping("/create")
     public ResponseEntity<?> createGrocery(@RequestBody GroceryItem groceryItem) {
         try {
-            // 调用time接口
-            String timeResponse = callTimeApi();
-            logger.info("Time API response: {}", timeResponse);
-
-            // 保存grocery item
             groceryItemRepo.save(groceryItem);
-            groceryItem.setName(groceryItem.getName() + " createTime: " + timeResponse);
             return new ResponseEntity<>(groceryItem, HttpStatus.CREATED);
         } catch (Exception e) {
             logger.error("Error creating grocery item: {}", e.getMessage());
             return new ResponseEntity<>("Error creating grocery item: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    private String callTimeApi() {
-        try (CloseableHttpAsyncClient httpClient = HttpAsyncClients.createDefault()) {
-            httpClient.start();
-            HttpPost httpPost = new HttpPost("http://localhost:8080/time");
-            
-            CompletableFuture<String> future = new CompletableFuture<>();
-            
-            httpClient.execute(httpPost, new FutureCallback<HttpResponse>() {
-                @Override
-                public void completed(HttpResponse response) {
-                    try {
-                        String responseBody = new BasicResponseHandler().handleResponse(response);
-                        future.complete(responseBody);
-                    } catch (Exception e) {
-                        future.completeExceptionally(e);
-                    }
-                }
-
-                @Override
-                public void failed(Exception ex) {
-                    future.completeExceptionally(ex);
-                }
-
-                @Override
-                public void cancelled() {
-                    future.cancel(true);
-                }
-            });
-
-            return future.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Error: " + e.getMessage();
         }
     }
 

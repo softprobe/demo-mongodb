@@ -9,10 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api")
-//@CrossOrigin(origins = "\"http://localhost:8081\", \"http://localhost:8082\", \"http://localhost:8083\", \"http://localhost:8084\"", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS}, allowCredentials = "true")
 public class LoginController {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
@@ -88,4 +86,4 @@ public class LoginController {
                     '}';
         }
     }
-} 
+}
