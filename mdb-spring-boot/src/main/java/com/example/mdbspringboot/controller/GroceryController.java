@@ -1,14 +1,13 @@
 package com.example.mdbspringboot.controller;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.mdbspringboot.model.HealthResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -36,17 +35,16 @@ public class GroceryController {
      */
     @GetMapping("getAll")
     public List<GroceryItem> getAllGroceries() {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.getForEntity("https://storage-onpremise-gcp.softprobe.ai/vi/health", String.class);
-        String json = response.getBody();
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode jsonNode = mapper.readTree(json);
-            logger.info("JSON Response: " + jsonNode.toString());
-        } catch (Exception e) {
-            logger.error("Error parsing JSON: {}", e.getMessage());
-            logger.info("Raw Response: " + json);
-        }
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(10000);
+        requestFactory.setReadTimeout(10000);
+
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
+        ResponseEntity<HealthResponse> response = restTemplate.getForEntity("https://storage-onpremise-gcp.softprobe.ai/vi/health", HealthResponse.class);
+        HealthResponse healthResponse = response.getBody();
+        logger.info("Response Code: " + healthResponse.getResponseStatusType().getResponseCode());
+        logger.info("Response Desc: " + healthResponse.getResponseStatusType().getResponseDesc());
+        logger.info("Body: " + healthResponse.getBody());
         return groceryItemRepo.findAll();
     }
 
