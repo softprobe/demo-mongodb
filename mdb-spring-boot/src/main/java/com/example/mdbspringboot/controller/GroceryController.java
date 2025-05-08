@@ -3,6 +3,9 @@ package com.example.mdbspringboot.controller;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,9 +37,16 @@ public class GroceryController {
     @GetMapping("getAll")
     public List<GroceryItem> getAllGroceries() {
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.getForEntity("https://ifconfig.me", String.class);
-        String message = response.getBody();
-        logger.info("My ip address is: " + message);
+        ResponseEntity<String> response = restTemplate.getForEntity("https://jsonplaceholder.typicode.com/todos/1", String.class);
+        String json = response.getBody();
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(json);
+            logger.info("JSON Response: " + jsonNode.toString());
+        } catch (Exception e) {
+            logger.error("Error parsing JSON: {}", e.getMessage());
+            logger.info("Raw Response: " + json);
+        }
         return groceryItemRepo.findAll();
     }
 
@@ -137,5 +147,3 @@ public class GroceryController {
 
     }
 }
-
-

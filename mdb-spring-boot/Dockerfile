@@ -7,7 +7,7 @@ COPY target/mdb-*.jar app.jar
 # https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar
 
 # Download the SoftProbe Java Agent
-RUN curl -L -o sp-agent.jar https://softprobe.oss-cn-hangzhou.aliyuncs.com/sp-agent-21.jar
+RUN curl -L -o sp-agent.jar https://storage.googleapis.com/softprobe-published-files/v0.1.58/sp-agent.jar
 
 # We also need to set the following environment variables. We'll set them in the Deployment.yaml file in the deployment repository.
 # Please see https://github.com/softprobe/deployment-k8s/blob/main/pro/backend/recording/deployment.yaml
