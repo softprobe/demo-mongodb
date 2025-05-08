@@ -37,7 +37,7 @@ public class GroceryController {
     @GetMapping("getAll")
     public List<GroceryItem> getAllGroceries() {
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.getForEntity("https://jsonplaceholder.typicode.com/todos/1", String.class);
+        ResponseEntity<String> response = restTemplate.getForEntity("https://storage-onpremise-gcp.softprobe.ai/vi/health", String.class);
         String json = response.getBody();
         try {
             ObjectMapper mapper = new ObjectMapper();
