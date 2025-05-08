@@ -3,11 +3,21 @@ package com.example.mdbspringboot.controller;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.impl.nio.client.HttpAsyncClients;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.concurrent.FutureCallback;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.HttpResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +36,8 @@ public class GroceryController {
 
     @Autowired
     private CustomItemRepository customRepo;
+    @Value("${sp.storage.uri:}")
+    private String storageUri;
 
     /**
      * GET /api/groceries
@@ -34,9 +46,9 @@ public class GroceryController {
     @GetMapping("getAll")
     public List<GroceryItem> getAllGroceries() {
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.getForEntity("https://ifconfig.me", String.class);
-        String message = response.getBody();
-        logger.info("My ip address is: " + message);
+        //ResponseEntity<String> response = restTemplate.getForEntity("https://ifconfig.me", String.class);
+        //String message = response.getBody();
+        //logger.info("My ip address is: " + message);
         return groceryItemRepo.findAll();
     }
 
@@ -66,6 +78,9 @@ public class GroceryController {
     public ResponseEntity<?> createGrocery(@RequestBody GroceryItem groceryItem) {
         try {
             groceryItemRepo.save(groceryItem);
+
+            String res = callApi();
+            groceryItem.setName(groceryItem.getName() + " " + res);
             return new ResponseEntity<>(groceryItem, HttpStatus.CREATED);
         } catch (Exception e) {
             logger.error("Error creating grocery item: {}", e.getMessage());
@@ -116,6 +131,41 @@ public class GroceryController {
         return groceryItemRepo.count();
     }
 
+    private String callApi() {
+        try (CloseableHttpAsyncClient httpClient = HttpAsyncClients.createDefault()) {
+            httpClient.start();
+            HttpGet httpPost = new HttpGet(storageUri + "/vi/health");
+
+            CompletableFuture<String> future = new CompletableFuture<>();
+
+            httpClient.execute(httpPost, new FutureCallback<HttpResponse>() {
+                @Override
+                public void completed(HttpResponse response) {
+                    try {
+                        String responseBody = new BasicResponseHandler().handleResponse(response);
+                        future.complete(responseBody);
+                    } catch (Exception e) {
+                        future.completeExceptionally(e);
+                    }
+                }
+
+                @Override
+                public void failed(Exception ex) {
+                    future.completeExceptionally(ex);
+                }
+
+                @Override
+                public void cancelled() {
+                    future.cancel(true);
+                }
+            });
+
+            return future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error: " + e.getMessage();
+        }
+    }
 
     public static class ResponseData {
         private String msg;
@@ -134,7 +184,6 @@ public class GroceryController {
         public void setCode(int code) {
             this.code = code;
         }
-
     }
 }
 
